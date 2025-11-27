@@ -13,9 +13,10 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "npm run build-only",
-    "build-only": "./node_modules/.bin/react-scripts build", 
+    "build-only": "./node_modules/.bin/react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "postinstall": "chmod +x ./node_modules/.bin/react-scripts"
   },
   "browserslist": {
     "production": [
