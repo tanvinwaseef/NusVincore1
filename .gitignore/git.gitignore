@@ -1,0 +1,14 @@
+# Ignore compiled web assets and local settings
+/build
+/android
+/ios
+/node_modules
+/platforms
+/plugins
+.DS_Store
+*.log
+npm-debug.log*
+
+# Ignore system files that cause permission issues
+/AppData
+.vscode

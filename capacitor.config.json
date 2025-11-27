@@ -1,0 +1,6 @@
+{
+  "appId": "com.love.nusvincore",
+  "appName": "NusVincore",
+  "webDir": "build",
+  "bundledWebRuntime": false
+}
