@@ -13,7 +13,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "npm run build-only",
-    "build-only": "./node_modules/.bin/react-scripts build", <--- NEW FIX
+    "build-only": "./node_modules/.bin/react-scripts build", 
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
