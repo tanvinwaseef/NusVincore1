@@ -14,13 +14,13 @@
     "tailwindcss": "^4.1.17"
   },
   "scripts": {
-  "start": "react-scripts start",
-  "build": "npm run build-only",
-  "build-only": "react-scripts build",
-  "test": "react-scripts test",
-  "eject": "react-scripts eject",
-  "prebuild": "npx chmod +x node_modules/.bin/react-scripts"
-},
+    "start": "react-scripts start",
+    "build": "npm run build-only",
+    "build-only": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "prebuild": "chmod +x ./node_modules/.bin/react-scripts"
+  },
   "browserslist": {
     "production": [
       ">0.2%",
