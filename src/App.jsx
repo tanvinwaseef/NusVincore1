@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Heart, Calendar, Image as ImageIcon, Send, Music, Scroll, MessageCircle, User, Ruler, GraduationCap, Cake, Camera, AlertTriangle, LogOut, Reply, Trash2, Edit2, X, Check, ArrowLeft, Phone, Video, PhoneIncoming, ChevronLeft, ChevronRight, Play, Pause, SkipBack, SkipForward, Disc, Headphones, Plus, Link as LinkIcon, ExternalLink } from 'lucide-react';
+import { Heart, Calendar, Image as ImageIcon, Send, Music, Scroll, MessageCircle, User, Ruler, GraduationCap, Cake, Camera, AlertTriangle, LogOut, Reply, Trash2, Edit2, X, Check, ArrowLeft, Phone, Video, PhoneIncoming, ChevronLeft, ChevronRight, Play, Pause, SkipBack, SkipForward, Disc, Headphones, Plus, Repeat, ImagePlus, Link as LinkIcon, Repeat1 } from 'lucide-react';
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
 import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, doc, updateDoc, deleteDoc, setDoc, query, orderBy } from 'firebase/firestore';
@@ -26,14 +26,15 @@ const THEMES = {
     bgGradient: 'from-[#020617] via-[#0f172a] to-[#172554]', 
     text: 'text-blue-50',
     textAccent: 'text-blue-300',
-    glassCard: 'bg-blue-900/20 backdrop-blur-2xl border border-blue-500/20 shadow-lg',
-    input: 'bg-blue-950/80 text-blue-100 border border-blue-500/20',
-    heartBtn: 'bg-gradient-to-br from-blue-500/20 to-blue-600/10 border border-blue-400/30 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.5)] backdrop-blur-md',
-    button: 'bg-blue-600 text-white shadow-md border border-blue-400/20',
-    navBar: 'bg-[#020617]/80 border-t border-blue-500/20',
-    navIcon: 'text-blue-100/80 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]',
-    chatBubbleMe: 'bg-blue-600 text-white shadow-md',
-    chatBubbleThem: 'bg-slate-800/80 text-blue-100 border border-white/5',
+    // Updated Glass Card: Lighter, more blur, white border
+    glassCard: 'bg-blue-900/20 backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)]',
+    input: 'bg-blue-950/60 text-blue-100 border border-white/10',
+    heartBtn: 'bg-gradient-to-br from-blue-500/20 to-blue-600/10 border border-white/20 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.5)] backdrop-blur-md',
+    button: 'bg-blue-600/90 text-white shadow-lg border border-white/20 backdrop-blur-sm',
+    navBar: 'bg-[#020617]/70 border-t border-white/10',
+    navIcon: 'text-blue-100/90 drop-shadow-[0_0_10px_rgba(255,255,255,0.6)]',
+    chatBubbleMe: 'bg-blue-600/90 text-white shadow-md backdrop-blur-sm border border-white/10',
+    chatBubbleThem: 'bg-slate-800/60 text-blue-100 border border-white/10 backdrop-blur-sm',
     orb1: 'bg-blue-600/10', 
     orb2: 'bg-cyan-900/10'
   },
@@ -42,14 +43,14 @@ const THEMES = {
     bgGradient: 'from-[#1a050d] via-[#2e0818] to-[#500724]',
     text: 'text-pink-50',
     textAccent: 'text-pink-300',
-    glassCard: 'bg-pink-900/20 backdrop-blur-2xl border border-pink-500/20 shadow-lg',
-    input: 'bg-pink-950/80 text-pink-100 border border-pink-500/20',
-    heartBtn: 'bg-gradient-to-br from-pink-500/20 to-pink-600/10 border border-pink-400/30 text-pink-400 shadow-[0_0_15px_rgba(236,72,153,0.5)] backdrop-blur-md',
-    button: 'bg-pink-600 text-white shadow-md border border-pink-400/20',
-    navBar: 'bg-[#1a050d]/80 border-t border-pink-500/20',
-    navIcon: 'text-pink-100/80 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]',
-    chatBubbleMe: 'bg-pink-600 text-white shadow-md',
-    chatBubbleThem: 'bg-gray-900/80 text-pink-100 border border-white/5',
+    glassCard: 'bg-pink-900/20 backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)]',
+    input: 'bg-pink-950/60 text-pink-100 border border-white/10',
+    heartBtn: 'bg-gradient-to-br from-pink-500/20 to-pink-600/10 border border-white/20 text-pink-400 shadow-[0_0_15px_rgba(236,72,153,0.5)] backdrop-blur-md',
+    button: 'bg-pink-600/90 text-white shadow-lg border border-white/20 backdrop-blur-sm',
+    navBar: 'bg-[#1a050d]/70 border-t border-white/10',
+    navIcon: 'text-pink-100/90 drop-shadow-[0_0_10px_rgba(255,255,255,0.6)]',
+    chatBubbleMe: 'bg-pink-600/90 text-white shadow-md backdrop-blur-sm border border-white/10',
+    chatBubbleThem: 'bg-gray-900/60 text-pink-100 border border-white/10 backdrop-blur-sm',
     orb1: 'bg-pink-900/10',
     orb2: 'bg-purple-900/10'
   }
@@ -57,14 +58,6 @@ const THEMES = {
 
 const CONFIG = {
   startDate: "2024-10-24T00:00:00", 
-  memories: [
-    { id: 1, title: "First Date", date: "Jan 1, 2023", color: "bg-pink-600" },
-    { id: 2, title: "Our Trip", date: "Mar 15, 2023", color: "bg-purple-600" },
-    { id: 3, title: "Best Birthday", date: "June 20, 2023", color: "bg-fuchsia-600" },
-    { id: 4, title: "Lazy Sunday", date: "Aug 5, 2023", color: "bg-rose-600" },
-    { id: 5, title: "The Concert", date: "Oct 12, 2023", color: "bg-indigo-600" },
-    { id: 6, title: "New Year's Eve", date: "Dec 31, 2023", color: "bg-violet-600" },
-  ],
   profiles: {
     her: { id: "nusra", name: "Nusra", fullName: "Maisha Tabassum Nusra", age: "14", bday: "Apr 2", height: "5'2", class: "Class 8", defaultImage: "nusra.jpg" },
     me: { id: "tanvin", name: "Tanvin", fullName: "Tanvin Waseef", age: "16", bday: "Oct 14", height: "5'9", class: "Class 9", defaultImage: "tanvin.jpg" }
@@ -116,7 +109,7 @@ const CallOverlay = ({ isActive, type, partnerName, onEnd, theme }) => {
       </div>
       <h2 className={`text-3xl font-bold ${theme.text} mb-2 tracking-tight`}>{partnerName}</h2>
       <p className={`${theme.text} opacity-60 mb-16 text-lg font-medium`}>{type === 'video' ? 'Video Calling...' : 'Calling...'}</p>
-      <button onClick={onEnd} className="w-20 h-20 rounded-full bg-red-500 flex items-center justify-center shadow-2xl active:scale-90 transition-transform hover:bg-red-600 border-4 border-black/20">
+      <button onClick={onEnd} className="w-20 h-20 rounded-full bg-red-500 flex items-center justify-center shadow-2xl active:scale-90 transition-transform hover:bg-red-600 border-4 border-white/20">
         <PhoneIncoming size={32} className="text-white rotate-[135deg]" />
       </button>
     </div>
@@ -134,7 +127,7 @@ const PhotoUploader = ({ currentImage, onImageUpload, id }) => {
     }
   };
   return (
-    <div onClick={() => fileInputRef.current?.click()} className="w-16 h-16 rounded-full overflow-hidden relative cursor-pointer group shrink-0 bg-white/10 border-2 border-white/20">
+    <div onClick={() => fileInputRef.current?.click()} className="w-16 h-16 rounded-full overflow-hidden relative cursor-pointer group shrink-0 bg-white/10 border border-white/30">
       <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*" />
       <img src={currentImage} alt="Profile" className="w-full h-full object-cover object-center" onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }} />
       <div className={`absolute inset-0 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] transition-opacity ${currentImage ? 'hidden' : 'flex'}`}>
@@ -144,90 +137,155 @@ const PhotoUploader = ({ currentImage, onImageUpload, id }) => {
   );
 };
 
-const ModernGallery = ({ memories, theme }) => {
+const ModernGallery = ({ theme }) => {
+  const [memories, setMemories] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [newDate, setNewDate] = useState("");
+  const [newImageUrl, setNewImageUrl] = useState("");
   const touchStart = useRef(0);
   const touchEnd = useRef(0);
+
+  useEffect(() => {
+      const q = query(collection(db, 'memories'), orderBy('createdAt', 'asc'));
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+          const mems = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          if (mems.length > 0) setMemories(mems);
+          else setMemories([{ id: 'default', title: "Add your first memory", date: "Tap + to add", color: "bg-blue-900" }]);
+      });
+      return () => unsubscribe();
+  }, []);
+
   useEffect(() => {
     let interval;
-    if (isPlaying) {
+    if (isPlaying && memories.length > 1) {
       interval = setInterval(() => {
         setCurrentIndex((prev) => (prev + 1) % memories.length);
       }, 3000);
     }
     return () => clearInterval(interval);
   }, [isPlaying, memories.length]);
+
   const handleSwipe = () => {
     if (touchStart.current - touchEnd.current > 50) setCurrentIndex((prev) => (prev + 1) % memories.length);
     if (touchStart.current - touchEnd.current < -50) setCurrentIndex((prev) => (prev - 1 + memories.length) % memories.length);
   };
+
+  const handleAddMemory = async (e) => {
+      e.preventDefault();
+      if (!newTitle || !newDate) return;
+      try {
+          await addDoc(collection(db, 'memories'), {
+              title: newTitle,
+              date: newDate,
+              image: newImageUrl, 
+              color: `bg-${Math.random() > 0.5 ? 'blue' : 'pink'}-600`,
+              createdAt: serverTimestamp()
+          });
+          setNewTitle(""); setNewDate(""); setNewImageUrl(""); setShowAddModal(false);
+      } catch (err) { console.error(err); }
+  };
+
+  const handleDeleteMemory = async () => {
+      if (window.confirm("Delete this memory?")) {
+          try { await deleteDoc(doc(db, 'memories', memories[currentIndex].id)); } catch(e) {}
+      }
+  }
+
   return (
-    <div className="flex flex-col gap-6 animate-fade-in">
+    <div className="flex flex-col gap-6 animate-fade-in relative">
       <div 
         className={`relative w-full aspect-[4/5] ${theme.glassCard} rounded-[2rem] overflow-hidden shadow-2xl transition-all duration-500 ring-1 ring-white/10`}
         onTouchStart={(e) => touchStart.current = e.targetTouches[0].clientX}
         onTouchMove={(e) => touchEnd.current = e.targetTouches[0].clientX}
         onTouchEnd={handleSwipe}
       >
-        <div className={`absolute inset-0 ${memories[currentIndex].color} flex items-center justify-center transition-colors duration-500`}>
-             <ImageIcon className="text-white/40 w-32 h-32" />
+        {memories[currentIndex]?.image ? (
+             <img src={memories[currentIndex].image} alt="Memory" className="absolute inset-0 w-full h-full object-cover" />
+        ) : (
+            <div className={`absolute inset-0 ${memories[currentIndex]?.color || 'bg-gray-800'} flex items-center justify-center transition-colors duration-500`}>
+                <ImageIcon className="text-white/40 w-32 h-32" />
+            </div>
+        )}
+        
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-6 pt-24 backdrop-blur-[2px]">
+          <h3 className="text-2xl font-bold text-white mb-1 tracking-wide">{memories[currentIndex]?.title}</h3>
+          <p className={`text-sm ${theme.text} opacity-80 font-medium`}>{memories[currentIndex]?.date}</p>
         </div>
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-6 pt-20 backdrop-blur-[2px]">
-          <h3 className="text-2xl font-bold text-white mb-1 tracking-wide">{memories[currentIndex].title}</h3>
-          <p className={`text-sm ${theme.text} opacity-80 font-medium`}>{memories[currentIndex].date}</p>
-        </div>
-        <div className="absolute top-4 right-4 flex gap-2">
-           <button onClick={() => setIsPlaying(!isPlaying)} className={`p-2 rounded-full bg-black/30 backdrop-blur-md text-white hover:bg-black/50 transition border border-white/10 active:scale-90`}>
+        <div className="absolute top-4 right-4 flex gap-2 z-10">
+            {memories[currentIndex]?.id !== 'default' && (
+                 <button onClick={handleDeleteMemory} className="p-2 rounded-full bg-black/40 backdrop-blur-md text-red-400 hover:bg-black/60 transition border border-white/10">
+                    <Trash2 size={16} />
+                 </button>
+            )}
+           <button onClick={() => setIsPlaying(!isPlaying)} className={`p-2 rounded-full bg-black/40 backdrop-blur-md text-white hover:bg-black/60 transition border border-white/10`}>
              {isPlaying ? <Pause size={16} /> : <Play size={16} />}
            </button>
         </div>
       </div>
-      <div>
-        <h3 className={`text-xs font-bold ${theme.text} mb-3 px-2 opacity-70 uppercase tracking-wider`}>Timeline</h3>
-        <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide px-1 snap-x">
+
+      <div className="flex items-center justify-between px-2">
+         <h3 className={`text-xs font-bold ${theme.text} opacity-70 uppercase tracking-wider`}>Timeline</h3>
+         <button onClick={() => setShowAddModal(true)} className="flex items-center gap-1 text-xs bg-white/10 px-3 py-1.5 rounded-full text-white hover:bg-white/20 transition border border-white/5">
+             <Plus size={12} /> Add Memory
+         </button>
+      </div>
+
+      <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide px-1 snap-x">
           {memories.map((mem, idx) => (
             <button 
               key={mem.id} 
               onClick={() => { setCurrentIndex(idx); setIsPlaying(false); }}
               className={`relative flex-shrink-0 w-16 h-16 rounded-2xl overflow-hidden transition-all duration-300 snap-start border border-white/10 ${idx === currentIndex ? 'ring-2 ring-white scale-105 shadow-lg' : 'opacity-60 scale-95'}`}
             >
-              <div className={`w-full h-full ${mem.color} flex items-center justify-center`}>
-                 <ImageIcon size={14} className="text-white/50" />
-              </div>
+              {mem.image ? (
+                  <img src={mem.image} className="w-full h-full object-cover" />
+              ) : (
+                  <div className={`w-full h-full ${mem.color} flex items-center justify-center`}>
+                     <ImageIcon size={14} className="text-white/50" />
+                  </div>
+              )}
             </button>
           ))}
-        </div>
       </div>
+
+      {showAddModal && (
+        <div className="absolute inset-0 z-50 bg-black/60 backdrop-blur-xl flex items-center justify-center p-6 animate-fade-in">
+            <div className={`bg-black/40 backdrop-blur-2xl border border-white/20 p-6 rounded-[2rem] w-full max-w-sm shadow-2xl`}>
+                <h3 className="text-xl font-bold text-white mb-4">Add Memory</h3>
+                <form onSubmit={handleAddMemory} className="flex flex-col gap-4">
+                    <input type="text" placeholder="Title" value={newTitle} onChange={e=>setNewTitle(e.target.value)} className={`p-3.5 rounded-xl ${theme.input} text-sm bg-white/5 outline-none focus:bg-white/10 transition`} required />
+                    <input type="text" placeholder="Date" value={newDate} onChange={e=>setNewDate(e.target.value)} className={`p-3.5 rounded-xl ${theme.input} text-sm bg-white/5 outline-none focus:bg-white/10 transition`} required />
+                    <input type="url" placeholder="Image URL (Drive/Dropbox)" value={newImageUrl} onChange={e=>setNewImageUrl(e.target.value)} className={`p-3.5 rounded-xl ${theme.input} text-sm bg-white/5 outline-none focus:bg-white/10 transition`} />
+                    
+                    <div className="flex gap-3 mt-2">
+                        <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 p-3 rounded-xl bg-white/5 text-white/70 text-sm hover:bg-white/10 transition border border-white/5">Cancel</button>
+                        <button type="submit" className={`flex-1 p-3 rounded-xl ${theme.button} text-sm`}>Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+      )}
     </div>
   );
 };
 
 // --- MUSIC PLAYER COMPONENT ---
-const MusicPlayer = ({ theme, identity, partnerName }) => {
-  const [currentSong, setCurrentSong] = useState(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+const MusicPlayer = ({ theme, identity, partnerName, globalAudio, globalSetSong, globalSetPlaying, globalSong, globalIsPlaying, globalIsRepeating, globalSetRepeating }) => {
   const [partnerActivity, setPartnerActivity] = useState(null);
   const [songs, setSongs] = useState([...CONFIG.playlist]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newSongTitle, setNewSongTitle] = useState("");
   const [newSongArtist, setNewSongArtist] = useState("");
   const [newSongUrl, setNewSongUrl] = useState("");
+  const [newSongCover, setNewSongCover] = useState(null);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   
-  const audioRef = useRef(new Audio());
+  const coverFileRef = useRef(null);
 
-  // 1. Cleanup on unmount
-  useEffect(() => {
-      const audio = audioRef.current;
-      return () => {
-          audio.pause();
-          audio.currentTime = 0;
-      };
-  }, []);
-
-  // 2. Fetch User Added Songs from Firestore
   useEffect(() => {
     const q = query(collection(db, 'user_songs'), orderBy('createdAt', 'desc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -237,7 +295,6 @@ const MusicPlayer = ({ theme, identity, partnerName }) => {
     return () => unsubscribe();
   }, []);
 
-  // 3. Sync with Partner
   useEffect(() => {
     const partnerId = identity === 'tanvin' ? 'nusra' : 'tanvin';
     const unsubscribe = onSnapshot(doc(db, 'music', partnerId), (doc) => {
@@ -253,106 +310,69 @@ const MusicPlayer = ({ theme, identity, partnerName }) => {
     return () => unsubscribe();
   }, [identity]);
 
-  // 4. Update My Status
   useEffect(() => {
-    if (currentSong) {
+    if (globalSong) {
         setDoc(doc(db, 'music', identity), {
-            songId: currentSong.id,
-            title: currentSong.title,
-            artist: currentSong.artist,
-            isPlaying: isPlaying,
-            lastUpdated: serverTimestamp()
-        });
-    } else {
-        // Explicitly set playing to false if no song loaded
-         setDoc(doc(db, 'music', identity), {
-            isPlaying: false,
+            songId: globalSong.id,
+            title: globalSong.title,
+            artist: globalSong.artist,
+            isPlaying: globalIsPlaying,
             lastUpdated: serverTimestamp()
         });
     }
-  }, [currentSong, isPlaying, identity]);
+  }, [globalSong, globalIsPlaying, identity]);
 
-  // 5. Audio Control
+  // UI Progress Updater
   useEffect(() => {
-    const audio = audioRef.current;
-    
-    const handleTimeUpdate = () => {
+    const audio = globalAudio.current;
+    const updateProgress = () => {
         setDuration(audio.duration || 0);
         setProgress(audio.currentTime);
     };
-    
-    const handleEnded = () => {
-        playNext();
-    };
-
-    audio.addEventListener('timeupdate', handleTimeUpdate);
-    audio.addEventListener('ended', handleEnded);
-
-    if (currentSong) {
-        if (audio.src !== currentSong.url) {
-            audio.src = currentSong.url;
-        }
-        if (isPlaying) {
-            const playPromise = audio.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(error => {
-                    if (error.name !== 'AbortError') setIsPlaying(false);
-                });
-            }
-        } else {
-            audio.pause();
-        }
-    } else {
-        audio.pause();
-        audio.currentTime = 0;
-    }
-
-    return () => {
-        audio.removeEventListener('timeupdate', handleTimeUpdate);
-        audio.removeEventListener('ended', handleEnded);
-    };
-  }, [currentSong, isPlaying]);
+    audio.addEventListener('timeupdate', updateProgress);
+    return () => audio.removeEventListener('timeupdate', updateProgress);
+  }, [globalAudio]);
 
   const playSong = (song) => {
-    if (currentSong?.id === song.id) {
-        setIsPlaying(!isPlaying);
-    } else {
-        setCurrentSong(song);
-        setIsPlaying(true);
-    }
+    if (globalSong?.id === song.id) globalSetPlaying(!globalIsPlaying);
+    else { globalSetSong(song); globalSetPlaying(true); }
   };
 
   const playNext = () => {
-      if(!currentSong) return;
-      const currentIndex = songs.findIndex(s => s.id === currentSong.id);
+      if(!globalSong) return;
+      const currentIndex = songs.findIndex(s => s.id === globalSong.id);
       const nextIndex = (currentIndex + 1) % songs.length;
       playSong(songs[nextIndex]);
   };
 
   const playPrev = () => {
-      if(!currentSong) return;
-      const currentIndex = songs.findIndex(s => s.id === currentSong.id);
+      if(!globalSong) return;
+      const currentIndex = songs.findIndex(s => s.id === globalSong.id);
       const prevIndex = (currentIndex - 1 + songs.length) % songs.length;
       playSong(songs[prevIndex]);
   };
 
   const handleSeek = (e) => {
       const newTime = parseFloat(e.target.value);
-      audioRef.current.currentTime = newTime;
+      globalAudio.current.currentTime = newTime;
       setProgress(newTime);
   };
 
   const syncWithPartner = () => {
       if (partnerActivity) {
           const song = songs.find(s => s.id === partnerActivity.songId);
-          if (song) {
-              setCurrentSong(song);
-              setIsPlaying(true);
-          }
+          if (song) { globalSetSong(song); globalSetPlaying(true); }
       }
   };
 
-  const handleAddLink = async (e) => {
+  const handleDeleteSong = async (songId, e) => {
+      e.stopPropagation();
+      if (window.confirm("Delete this song?")) {
+          try { await deleteDoc(doc(db, 'user_songs', songId)); } catch(e) {}
+      }
+  };
+
+  const handleAddSong = async (e) => {
       e.preventDefault();
       if (!newSongTitle || !newSongArtist || !newSongUrl) return;
       try {
@@ -360,12 +380,22 @@ const MusicPlayer = ({ theme, identity, partnerName }) => {
               title: newSongTitle,
               artist: newSongArtist,
               url: newSongUrl,
+              coverImage: newSongCover, 
               createdAt: serverTimestamp(),
-              cover: `bg-${Math.random() > 0.5 ? 'blue' : 'pink'}-500`
+              cover: `bg-${Math.random() > 0.5 ? 'blue' : 'pink'}-500` 
           });
-          setNewSongTitle(""); setNewSongArtist(""); setNewSongUrl(""); setShowAddModal(false);
+          setNewSongTitle(""); setNewSongArtist(""); setNewSongUrl(""); setNewSongCover(null); setShowAddModal(false);
       } catch (err) { console.error("Add song failed", err); }
   };
+
+  const handleCoverPick = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+          const base64 = await compressImage(file);
+          setNewSongCover(base64);
+      } catch(err) {}
+  }
 
   const formatTime = (time) => {
       if (isNaN(time)) return "0:00";
@@ -381,47 +411,48 @@ const MusicPlayer = ({ theme, identity, partnerName }) => {
                 <div className="flex items-center gap-3 overflow-hidden">
                     <Headphones size={20} className="text-pink-300 shrink-0" />
                     <div className="truncate">
-                        <p className="text-xs text-white/90 font-bold truncate">{partnerName} is listening to...</p>
+                        <p className="text-xs text-white/90 font-bold truncate">{partnerName} is listening...</p>
                         <p className="text-[10px] text-white/60 truncate">{partnerActivity.title}</p>
                     </div>
                 </div>
                 <button onClick={syncWithPartner} className="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full text-[10px] font-bold text-white border border-white/10 transition-colors shrink-0">
-                    Listen Together
+                    Join
                 </button>
             </div>
         )}
 
-        <div className={`mx-6 my-6 aspect-square ${theme.glassCard} rounded-[2.5rem] flex flex-col items-center justify-center relative overflow-hidden shadow-2xl`}>
-            {currentSong ? (
+        <div className={`mx-6 my-6 aspect-square ${theme.glassCard} rounded-[2.5rem] flex flex-col items-center justify-center relative overflow-hidden shadow-2xl ring-1 ring-white/10`}>
+            {globalSong ? (
                 <>
-                    <div className={`absolute inset-0 ${currentSong.cover} opacity-20 blur-2xl`}></div>
-                    <div className={`w-40 h-40 rounded-full border-4 border-white/10 flex items-center justify-center shadow-2xl ${isPlaying ? 'animate-[spin_10s_linear_infinite]' : ''}`}>
-                        <Disc size={64} className="text-white/50" />
+                    {globalSong.coverImage ? (
+                         <img src={globalSong.coverImage} className="absolute inset-0 w-full h-full object-cover opacity-30 blur-xl" />
+                    ) : (
+                        <div className={`absolute inset-0 ${globalSong.cover} opacity-20 blur-2xl`}></div>
+                    )}
+                    
+                    <div className={`w-48 h-48 rounded-full border-4 border-white/10 flex items-center justify-center shadow-2xl overflow-hidden ${globalIsPlaying ? 'animate-[spin_10s_linear_infinite]' : ''}`}>
+                         {globalSong.coverImage ? (
+                             <img src={globalSong.coverImage} className="w-full h-full object-cover" />
+                         ) : (
+                            <Disc size={80} className="text-white/50" />
+                         )}
                     </div>
-                    <div className="mt-8 text-center z-10 px-6">
-                        <h2 className="text-2xl font-bold text-white mb-1 truncate w-full">{currentSong.title}</h2>
-                        <p className={`text-sm ${theme.text} opacity-70`}>{currentSong.artist}</p>
+                    <div className="mt-6 text-center z-10 px-6 w-full">
+                        <h2 className="text-2xl font-bold text-white mb-1 truncate">{globalSong.title}</h2>
+                        <p className={`text-sm ${theme.text} opacity-70 truncate`}>{globalSong.artist}</p>
                     </div>
                 </>
             ) : (
                 <div className="flex flex-col items-center text-white/40">
                     <Music size={48} className="mb-4" />
-                    <p className="text-sm">Select a song to play</p>
+                    <p className="text-sm">Select a song</p>
                 </div>
             )}
         </div>
 
         <div className="px-8 flex flex-col gap-4 mb-6">
-            {/* Interactive Slider */}
             <div className="flex flex-col gap-2">
-                <input 
-                    type="range" 
-                    min="0" 
-                    max={duration || 0} 
-                    value={progress} 
-                    onChange={handleSeek}
-                    className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-white"
-                />
+                <input type="range" min="0" max={duration || 0} value={progress} onChange={handleSeek} className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-white" />
                 <div className="flex justify-between text-[10px] text-white/50 font-medium">
                     <span>{formatTime(progress)}</span>
                     <span>{formatTime(duration)}</span>
@@ -429,49 +460,73 @@ const MusicPlayer = ({ theme, identity, partnerName }) => {
             </div>
 
             <div className="flex items-center justify-between px-4 mt-2">
-                <button onClick={playPrev} className={`text-white/60 hover:text-white transition active:scale-90`}><SkipBack size={32} /></button>
-                <button 
-                    onClick={() => setIsPlaying(!isPlaying)}
-                    className={`w-16 h-16 rounded-full flex items-center justify-center bg-white text-black shadow-xl active:scale-95 transition-all hover:scale-105`}
-                >
-                    {isPlaying ? <Pause size={28} fill="currentColor" /> : <Play size={28} fill="currentColor" className="ml-1" />}
+                <button onClick={playPrev} className={`text-white/60 hover:text-white transition active:scale-90`}><SkipBack size={28} /></button>
+                <button onClick={() => globalSetPlaying(!globalIsPlaying)} className={`w-16 h-16 rounded-full flex items-center justify-center bg-white text-black shadow-xl active:scale-95 transition-all hover:scale-105`}>
+                    {globalIsPlaying ? <Pause size={28} fill="currentColor" /> : <Play size={28} fill="currentColor" className="ml-1" />}
                 </button>
-                <button onClick={playNext} className={`text-white/60 hover:text-white transition active:scale-90`}><SkipForward size={32} /></button>
+                <button onClick={playNext} className={`text-white/60 hover:text-white transition active:scale-90`}><SkipForward size={28} /></button>
+            </div>
+            
+            <div className="flex justify-center">
+                 <button onClick={() => globalSetRepeating(!globalIsRepeating)} className={`p-2 rounded-full transition ${globalIsRepeating ? 'bg-white/20 text-white' : 'text-white/40'}`}>
+                     <Repeat1 size={18} />
+                 </button>
             </div>
         </div>
 
         <div className="px-6 flex items-center justify-between mb-3">
             <h3 className={`text-xs font-bold ${theme.text} uppercase tracking-wider opacity-60`}>Library</h3>
-            <button onClick={() => setShowAddModal(true)} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition"><Plus size={16} className="text-white" /></button>
+            <button onClick={() => setShowAddModal(true)} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition border border-white/5"><Plus size={16} className="text-white" /></button>
         </div>
         
         <div className="px-6 flex flex-col gap-3 pb-4">
             {songs.map((song) => (
-                <button key={song.id} onClick={() => playSong(song)} className={`flex items-center gap-4 p-3 rounded-2xl transition-all ${currentSong?.id === song.id ? 'bg-white/10 border border-white/10' : 'hover:bg-white/5 border border-transparent'}`}>
-                    <div className={`w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0`}>
-                        <Music size={16} className="text-white/50" />
-                    </div>
-                    <div className="text-left flex-1 min-w-0">
-                        <h4 className={`text-sm font-bold ${currentSong?.id === song.id ? 'text-white' : theme.text} truncate`}>{song.title}</h4>
-                        <p className="text-[10px] text-white/40 truncate">{song.artist}</p>
-                    </div>
-                    {currentSong?.id === song.id && isPlaying && <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>}
-                </button>
+                <div key={song.id} className={`flex items-center gap-4 p-3 rounded-2xl transition-all group ${globalSong?.id === song.id ? 'bg-white/10 border border-white/10' : 'hover:bg-white/5 border border-transparent'}`}>
+                    <button onClick={() => playSong(song)} className="flex-1 flex items-center gap-4 text-left min-w-0">
+                        <div className={`w-10 h-10 rounded-xl overflow-hidden bg-white/5 flex items-center justify-center shrink-0`}>
+                            {song.coverImage ? <img src={song.coverImage} className="w-full h-full object-cover" /> : <Music size={16} className="text-white/50" />}
+                        </div>
+                        <div className="min-w-0">
+                            <h4 className={`text-sm font-bold ${globalSong?.id === song.id ? 'text-white' : theme.text} truncate`}>{song.title}</h4>
+                            <p className="text-[10px] text-white/40 truncate">{song.artist}</p>
+                        </div>
+                    </button>
+                    
+                    {globalSong?.id === song.id && globalIsPlaying && (
+                        <div className="flex gap-0.5 h-3 items-end mr-2">
+                            <div className="w-1 bg-green-400 animate-[bounce_1s_infinite] h-full"></div>
+                            <div className="w-1 bg-green-400 animate-[bounce_1.2s_infinite] h-2/3"></div>
+                        </div>
+                    )}
+                    {/* Delete Button for Custom Songs */}
+                    {typeof song.id === 'string' && song.id.length > 5 && (
+                        <button onClick={(e) => handleDeleteSong(song.id, e)} className="p-2 text-white/20 hover:text-red-400 transition">
+                            <Trash2 size={14} />
+                        </button>
+                    )}
+                </div>
             ))}
         </div>
 
+        {/* Add Song Modal - Glassy */}
         {showAddModal && (
-            <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-6 animate-fade-in">
-                <div className={`${theme.glassCard} p-6 rounded-[2rem] w-full max-w-sm`}>
-                    <h3 className="text-xl font-bold text-white mb-4">Add Music Link</h3>
-                    <form onSubmit={handleAddLink} className="flex flex-col gap-4">
-                        <input type="text" placeholder="Song Title" value={newSongTitle} onChange={e=>setNewSongTitle(e.target.value)} className={`p-3 rounded-xl ${theme.input} text-sm bg-black/40 outline-none`} required />
-                        <input type="text" placeholder="Artist Name" value={newSongArtist} onChange={e=>setNewSongArtist(e.target.value)} className={`p-3 rounded-xl ${theme.input} text-sm bg-black/40 outline-none`} required />
-                        <input type="url" placeholder="MP3 URL (Direct Link)" value={newSongUrl} onChange={e=>setNewSongUrl(e.target.value)} className={`p-3 rounded-xl ${theme.input} text-sm bg-black/40 outline-none`} required />
+            <div className="absolute inset-0 z-50 bg-black/60 backdrop-blur-xl flex items-center justify-center p-6 animate-fade-in">
+                <div className={`bg-black/40 backdrop-blur-2xl border border-white/20 p-6 rounded-[2rem] w-full max-w-sm shadow-2xl`}>
+                    <h3 className="text-xl font-bold text-white mb-4">Add New Song</h3>
+                    <form onSubmit={handleAddSong} className="flex flex-col gap-4">
+                        <input type="text" placeholder="Song Title" value={newSongTitle} onChange={e=>setNewSongTitle(e.target.value)} className={`p-3.5 rounded-xl ${theme.input} text-sm bg-white/5 outline-none focus:bg-white/10 transition`} required />
+                        <input type="text" placeholder="Artist Name" value={newSongArtist} onChange={e=>setNewSongArtist(e.target.value)} className={`p-3.5 rounded-xl ${theme.input} text-sm bg-white/5 outline-none focus:bg-white/10 transition`} required />
+                        <input type="url" placeholder="MP3 Direct Link (Dropbox/GitHub/etc)" value={newSongUrl} onChange={e=>setNewSongUrl(e.target.value)} className={`p-3.5 rounded-xl ${theme.input} text-sm bg-white/5 outline-none focus:bg-white/10 transition`} required />
                         
+                        <div onClick={() => coverFileRef.current?.click()} className="flex items-center justify-center gap-2 p-3 rounded-xl bg-white/5 border border-white/10 text-sm text-white/70 cursor-pointer hover:bg-white/10 transition h-16 relative overflow-hidden">
+                            {newSongCover ? <img src={newSongCover} className="absolute inset-0 w-full h-full object-cover opacity-60" /> : <ImagePlus size={18} />}
+                            <span className="relative z-10">{newSongCover ? "Change Cover" : "Add Cover Art"}</span>
+                            <input type="file" ref={coverFileRef} onChange={handleCoverPick} className="hidden" accept="image/*" />
+                        </div>
+
                         <div className="flex gap-3 mt-2">
-                            <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 p-3 rounded-xl bg-white/5 text-white/70 text-sm hover:bg-white/10 transition">Cancel</button>
-                            <button type="submit" className={`flex-1 p-3 rounded-xl ${theme.button} text-sm flex items-center justify-center gap-2`}>Add Song</button>
+                            <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 p-3 rounded-xl bg-white/5 text-white/70 text-sm hover:bg-white/10 transition border border-white/5">Cancel</button>
+                            <button type="submit" className={`flex-1 p-3 rounded-xl ${theme.button} text-sm`}>Save Song</button>
                         </div>
                     </form>
                 </div>
@@ -534,13 +589,13 @@ const RelationshipTimer = ({ theme }) => {
     updateTime(); return () => clearInterval(timer);
   }, []);
   return (
-    <div className={`${theme.glassCard} rounded-[2rem] p-6 mb-6 hover:shadow-[0_0_30px_rgba(255,255,255,0.1)] transition-shadow duration-500`}>
+    <div className={`${theme.glassCard} rounded-[2rem] p-6 mb-6`}>
       <h2 className={`text-sm font-bold ${theme.text} mb-4 flex items-center gap-2 pl-1 opacity-90 tracking-widest uppercase`}>
         <Calendar className={theme.textAccent} size={14} /> Time Together
       </h2>
       <div className="grid grid-cols-4 gap-3 text-center">
         {[{l:'Days',v:time.days}, {l:'Hrs',v:time.hours}, {l:'Mins',v:time.minutes}, {l:'Secs',v:time.seconds}].map((item, i) => (
-          <div key={i} className="flex flex-col bg-white/5 rounded-2xl py-3 backdrop-blur-sm border border-white/10 shadow-inner">
+          <div key={i} className="flex flex-col bg-white/5 rounded-2xl py-3 backdrop-blur-sm border border-white/10">
             <span className={`text-xl font-bold ${theme.textAccent} font-mono drop-shadow-md`}>{item.v}</span>
             <span className={`text-[8px] uppercase tracking-widest ${theme.text} opacity-50 mt-1`}>{item.l}</span>
           </div>
@@ -555,7 +610,7 @@ const ProfileSection = ({ profileImages, updateImage, theme, partnerStatus }) =>
     <div className="grid grid-cols-2 gap-4 mb-6">
       {[CONFIG.profiles.me, CONFIG.profiles.her].map((profile, i) => {
         return (
-          <div key={i} className={`${theme.glassCard} rounded-[2rem] p-5 flex flex-col items-center text-center relative overflow-hidden hover:bg-white/5 transition-colors duration-300`}>
+          <div key={i} className={`${theme.glassCard} rounded-[2rem] p-5 flex flex-col items-center text-center relative overflow-hidden`}>
              <div className="mb-3 relative">
                <PhotoUploader id={profile.id} currentImage={profileImages[profile.id]} onImageUpload={(url) => updateImage(profile.id, url)} />
                {((profile.id === 'nusra' && theme.id === 'tanvin') || (profile.id === 'tanvin' && theme.id === 'nusra')) && (
@@ -573,32 +628,9 @@ const ProfileSection = ({ profileImages, updateImage, theme, partnerStatus }) =>
   );
 };
 
-const MessageMenu = ({ isMe, onClose, onReply, onEdit, onDelete, theme }) => (
-  <div className="absolute bottom-full mb-2 right-0 bg-black/80 backdrop-blur-xl border border-white/10 rounded-[1.5rem] shadow-2xl p-2 flex flex-col gap-1 min-w-[120px] z-50 overflow-hidden animate-fade-in origin-bottom-right">
-    <button onClick={(e) => { e.stopPropagation(); onReply(); }} className={`flex items-center gap-3 px-4 py-3 text-[12px] font-medium ${theme.text} hover:bg-white/10 transition-all rounded-xl active:scale-95`}> 
-      <Reply size={16} /> Reply 
-    </button>
-    {isMe && (
-      <>
-        <button onClick={(e) => { e.stopPropagation(); onEdit(); }} className={`flex items-center gap-3 px-4 py-3 text-[12px] font-medium ${theme.text} hover:bg-white/10 transition-all rounded-xl active:scale-95`}> 
-          <Edit2 size={16} /> Edit 
-        </button>
-        <button onClick={(e) => { e.stopPropagation(); onDelete(); }} className="flex items-center gap-3 px-4 py-3 text-[12px] font-medium text-red-400 hover:bg-red-500/10 transition-all rounded-xl active:scale-95"> 
-          <Trash2 size={16} /> Unsend 
-        </button>
-      </>
-    )}
-    <div className="h-px bg-white/10 my-1 mx-2"></div>
-    <button onClick={(e) => { e.stopPropagation(); onClose(); }} className={`text-[11px] py-2 ${theme.text} opacity-50 hover:opacity-100 transition-opacity text-center`}>Cancel</button>
-  </div>
-);
-
 const ChatFeature = ({ identity, user, theme, partnerStatus, startCall }) => { 
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
-  const [replyingTo, setReplyingTo] = useState(null);
-  const [editingMsg, setEditingMsg] = useState(null);
-  const [menuOpenId, setMenuOpenId] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const messagesEndRef = useRef(null);
@@ -622,20 +654,13 @@ const ChatFeature = ({ identity, user, theme, partnerStatus, startCall }) => {
     if (!newMessage.trim() && !uploading) return;
     const msgToSend = newMessage;
     setNewMessage(""); 
-    if (editingMsg) {
-      try { await updateDoc(doc(db, 'messages', editingMsg.id), { text: msgToSend }); setEditingMsg(null); } catch(e) {}
-      return;
-    }
     try {
-      const replyText = replyingTo ? (replyingTo.text || (replyingTo.image ? "Photo" : "Message")) : null;
       await addDoc(collection(db, 'messages'), {
         text: msgToSend,
         senderId: identity,
         senderName: CONFIG.profiles[identity === 'tanvin' ? 'me' : 'her'].name,
-        timestamp: Date.now(),
-        replyTo: replyingTo ? { id: replyingTo.id, text: replyText || "", sender: replyingTo.senderName } : null
+        timestamp: Date.now()
       });
-      setReplyingTo(null);
     } catch (error) {}
   };
 
@@ -649,9 +674,10 @@ const ChatFeature = ({ identity, user, theme, partnerStatus, startCall }) => {
     } catch (err) {}
     setUploading(false);
   };
-
+  
+  // Simple Delete - Immediate
   const handleDelete = async (id) => {
-    try { await deleteDoc(doc(db, 'messages', id)); setMenuOpenId(null); } catch(e) {}
+     try { await deleteDoc(doc(db, 'messages', id)); } catch(e) {}
   };
 
   return (
@@ -663,26 +689,23 @@ const ChatFeature = ({ identity, user, theme, partnerStatus, startCall }) => {
           const isMe = msg.senderId === identity;
           return (
             <div key={msg.id} className={`flex flex-col ${isMe ? 'items-end self-end' : 'items-start self-start'} relative group max-w-[85%] animate-fade-in-up`}>
-              {msg.replyTo && (
-                <div className={`text-[10px] mb-1 px-3 py-1.5 rounded-2xl bg-white/10 text-white/70 truncate w-full border-l-2 border-white/30 backdrop-blur-sm`}>Replying to {msg.replyTo.sender}: {msg.replyTo.text}</div>
-              )}
-              <div onClick={() => setMenuOpenId(menuOpenId === msg.id ? null : msg.id)} className={`px-4 py-3 rounded-[1.5rem] text-sm cursor-pointer transition-all duration-200 active:scale-95 ${isMe ? theme.chatBubbleMe : theme.chatBubbleThem} ${isMe ? 'rounded-br-sm' : 'rounded-bl-sm'} w-fit break-all whitespace-pre-wrap shadow-lg`}>
+              <div className={`px-4 py-3 rounded-[1.5rem] text-sm transition-all duration-200 ${isMe ? theme.chatBubbleMe : theme.chatBubbleThem} ${isMe ? 'rounded-br-sm' : 'rounded-bl-sm'} w-fit break-all whitespace-pre-wrap shadow-lg`}>
                 {msg.image ? <img src={msg.image} alt="Shared" className="rounded-xl max-w-full max-h-[200px] object-cover" /> : <p className="leading-relaxed tracking-wide">{msg.text}</p>}
               </div>
-              {menuOpenId === msg.id && <MessageMenu isMe={isMe} onClose={() => setMenuOpenId(null)} onReply={() => { setReplyingTo(msg); setMenuOpenId(null); }} onEdit={() => { setEditingMsg(msg); setNewMessage(msg.text); setMenuOpenId(null); }} onDelete={() => handleDelete(msg.id)} theme={theme} />}
+               {isMe && (
+                   <button onClick={() => handleDelete(msg.id)} className="text-[9px] text-red-400 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Unsend</button>
+               )}
               <span className={`text-[9px] ${theme.text} opacity-40 mt-1 px-2 font-medium tracking-wider`}>{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
             </div>
           );
         })}
         <div ref={messagesEndRef} />
       </div>
-      {replyingTo && <div className="flex items-center justify-between bg-black/40 backdrop-blur-md border-t border-white/10 p-3 px-4 text-xs text-white/80 mx-3 rounded-t-2xl"><div className="truncate opacity-90">Replying to <b>{replyingTo.senderName}</b></div><button onClick={() => setReplyingTo(null)}><X size={14} /></button></div>}
       <form onSubmit={handleSend} className={`flex gap-3 items-center p-2.5 m-3 rounded-[2.5rem] ${theme.input} shadow-[0_8px_32px_rgba(0,0,0,0.3)] relative z-20 backdrop-blur-xl border border-white/10`}>
         <input type="file" ref={fileInputRef} onChange={handleImageUpload} className="hidden" accept="image/*" />
         <button type="button" onClick={() => fileInputRef.current?.click()} className={`p-3 rounded-full text-white/80 hover:text-white hover:bg-white/10 transition-all active:scale-90 ${uploading ? 'animate-pulse' : ''}`}><Camera size={20} /></button>
-        <input type="text" value={newMessage} onChange={(e) => setNewMessage(e.target.value)} placeholder={editingMsg ? "Edit message..." : "Type a message..."} className="flex-1 bg-transparent text-sm focus:outline-none text-white/90 placeholder-white/40 min-w-0 px-2 font-medium" />
-        {editingMsg && <button type="button" onClick={() => { setEditingMsg(null); setNewMessage(""); }} className="p-2 text-white/50 hover:text-white"><X size={18} /></button>}
-        <button type="submit" className={`p-3 rounded-full ${theme.button} shadow-lg shrink-0 active:scale-90 transition-all hover:brightness-110`}><Check size={20} className={editingMsg ? "" : "hidden"} /><Send size={20} className={!editingMsg ? "" : "hidden"} /></button>
+        <input type="text" value={newMessage} onChange={(e) => setNewMessage(e.target.value)} placeholder="Type a message..." className="flex-1 bg-transparent text-sm focus:outline-none text-white/90 placeholder-white/40 min-w-0 px-2 font-medium" />
+        <button type="submit" className={`p-3 rounded-full ${theme.button} shadow-lg shrink-0 active:scale-90 transition-all hover:brightness-110`}><Send size={20} /></button>
       </form>
     </div>
   );
@@ -698,12 +721,67 @@ export default function App() {
   const [profileImages, setProfileImages] = useState({ tanvin: CONFIG.profiles.me.defaultImage, nusra: CONFIG.profiles.her.defaultImage });
   const [calling, setCalling] = useState(false);
   const [callType, setCallType] = useState('audio');
+  const [globalSong, setGlobalSong] = useState(null);
+  const [globalIsPlaying, setGlobalIsPlaying] = useState(false);
+  const [globalIsRepeating, setGlobalIsRepeating] = useState(false);
+  const globalAudio = useRef(new Audio());
   
+  // Audio Lifecycle Management at APP LEVEL
+  useEffect(() => {
+      const audio = globalAudio.current;
+      if (globalSong) {
+          if (audio.src !== globalSong.url) audio.src = globalSong.url;
+          if (globalIsPlaying) {
+              const playPromise = audio.play();
+              if (playPromise !== undefined) {
+                  playPromise.catch(error => {
+                      if (error.name !== 'AbortError') setGlobalIsPlaying(false);
+                  });
+              }
+          } else {
+              audio.pause();
+          }
+      } else {
+          audio.pause();
+      }
+  }, [globalSong, globalIsPlaying]);
+
   useEffect(() => { const initAuth = async () => { try { await signInAnonymously(auth); } catch (error) { if (error.code === 'auth/configuration-not-found') setAuthError(true); } }; initAuth(); return onAuthStateChanged(auth, (u) => setUser(u)); }, []);
   useEffect(() => { const savedId = localStorage.getItem('love_capsule_identity'); if (savedId) setIdentity(savedId); setProfileImages(prev => ({ tanvin: localStorage.getItem('love_capsule_photo_tanvin') || prev.tanvin, nusra: localStorage.getItem('love_capsule_photo_nusra') || prev.nusra })); }, []);
-  useEffect(() => { if (!identity || !user) return; const updateMyStatus = async () => { try { await setDoc(doc(db, 'status', identity), { lastSeen: serverTimestamp() }); } catch (e) {} }; updateMyStatus(); const interval = setInterval(updateMyStatus, 10000); const partnerId = identity === 'tanvin' ? 'nusra' : 'tanvin'; const unsubscribe = onSnapshot(doc(db, 'status', partnerId), (doc) => { if (doc.exists()) { const data = doc.data(); const lastSeen = data.lastSeen?.toMillis ? data.lastSeen.toMillis() : 0; setPartnerStatus(Date.now() - lastSeen < 15000 ? 'online' : 'offline'); } }); return () => { clearInterval(interval); unsubscribe(); }; }, [identity, user]);
+  
+  // Presence & Update Status for Music
+  useEffect(() => { 
+      if (!identity || !user) return; 
+      const updateMyStatus = async () => { 
+          try { 
+              // Update status AND Music info here to keep single writer
+              await setDoc(doc(db, 'music', identity), { 
+                 lastSeen: serverTimestamp(),
+                 isPlaying: globalIsPlaying,
+                 songId: globalSong?.id || null,
+                 title: globalSong?.title || null
+              }, { merge: true });
+
+              // Also legacy status doc if needed
+               await setDoc(doc(db, 'status', identity), { lastSeen: serverTimestamp() });
+          } catch (e) {} 
+      }; 
+      updateMyStatus(); 
+      const interval = setInterval(updateMyStatus, 10000); 
+      
+      const partnerId = identity === 'tanvin' ? 'nusra' : 'tanvin'; 
+      const unsubscribe = onSnapshot(doc(db, 'status', partnerId), (doc) => { if (doc.exists()) { const data = doc.data(); const lastSeen = data.lastSeen?.toMillis ? data.lastSeen.toMillis() : 0; setPartnerStatus(Date.now() - lastSeen < 15000 ? 'online' : 'offline'); } }); 
+      return () => { clearInterval(interval); unsubscribe(); }; 
+  }, [identity, user, globalIsPlaying, globalSong]);
+
   const handleIdentitySelect = (id) => { setIdentity(id); localStorage.setItem('love_capsule_identity', id); };
-  const handleLogout = () => { setIdentity(null); localStorage.removeItem('love_capsule_identity'); };
+  const handleLogout = () => { 
+      setIdentity(null); 
+      localStorage.removeItem('love_capsule_identity');
+      setGlobalSong(null);
+      setGlobalIsPlaying(false);
+      globalAudio.current.pause();
+  };
   const updateProfileImage = (id, url) => { setProfileImages(prev => ({ ...prev, [id]: url })); };
   useEffect(() => { if (!user || !identity) return; const unsubscribe = onSnapshot(collection(db, 'signals'), (snapshot) => { snapshot.docChanges().forEach((change) => { if (change.type === "added") { const data = change.doc.data(); if (data.timestamp > Date.now() - 5000 && data.senderId !== identity) { const heartColor = data.senderId === 'tanvin' ? 'text-blue-500' : 'text-pink-500'; spawnMultipleHearts(heartColor); } } }); }); return () => unsubscribe(); }, [user, identity]);
   const sendRemoteHeart = async () => { const theme = THEMES[identity]; spawnHeart(theme.heartColor); if (!user || !identity) return; try { await addDoc(collection(db, 'signals'), { type: 'heart', senderId: identity, timestamp: Date.now() }); } catch (e) {} };
@@ -749,7 +827,8 @@ export default function App() {
         ) : (
           <div className="flex items-center justify-between w-full animate-fade-in">
             <div className="flex items-center gap-3">
-              <div className={`w-11 h-11 rounded-full shadow-[0_0_20px_rgba(255,255,255,0.1)] overflow-hidden border-2 ${theme.id === 'tanvin' ? 'border-blue-400/30' : 'border-pink-400/30'}`}>
+              <div className={`w-11 h-11 rounded-full shadow-[0_0_20px_rgba(255,255,255,0.1)] overflow-hidden relative bg-black/30`}>
+                  {/* Circular Profile Picture on Glass Card */}
                  <img src={profileImages[myProfile.id]} className="w-full h-full object-cover" onError={(e)=>e.target.style.display='none'} />
               </div>
               <div>
@@ -776,9 +855,9 @@ export default function App() {
           </div>
         )}
 
-        {activeTab === 'gallery' && <div className="animate-fade-in pt-2"><ModernGallery memories={CONFIG.memories} theme={theme} /></div>}
+        {activeTab === 'gallery' && <div className="animate-fade-in pt-2"><ModernGallery theme={theme} /></div>}
 
-        {activeTab === 'music' && <MusicPlayer theme={theme} identity={identity} partnerName={partnerProfile.name} />}
+        {activeTab === 'music' && <MusicPlayer theme={theme} identity={identity} partnerName={partnerProfile.name} globalAudio={globalAudio} globalSetSong={setGlobalSong} globalSetPlaying={setGlobalIsPlaying} globalSong={globalSong} globalIsPlaying={globalIsPlaying} globalIsRepeating={globalIsRepeating} globalSetRepeating={setGlobalIsRepeating} />}
 
         {activeTab === 'messages' && <ChatFeature identity={identity} user={user} theme={theme} startCall={startCall} />}
       </main>
