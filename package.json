@@ -4,18 +4,21 @@
   "private": true,
   "dependencies": {
     "@capacitor/android": "^7.4.4",
+    "autoprefixer": "^10.4.22",
     "firebase": "^12.6.0",
     "lucide-react": "^0.555.0",
+    "postcss": "^8.5.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1"
+    "react-scripts": "5.0.1",
+    "tailwindcss": "^4.1.17"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "chmod +x ./node_modules/.bin/react-scripts && react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
+  "start": "react-scripts start",
+  "build": "GENERATE_SOURCEMAP=false && react-scripts build",
+  "test": "react-scripts test",
+  "eject": "react-scripts eject"
+},
   "browserslist": {
     "production": [
       ">0.2%",
